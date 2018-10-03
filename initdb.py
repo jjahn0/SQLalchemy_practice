@@ -16,6 +16,30 @@ Base = declarative_base()
 #     def __repr__(self):
 #         return '<User %r>' % self.username
 
+# class Rider(db.Model):
+#     __tablename__ = 'rider'
+#     id = Column(db.Integer, primary_key=True)
+#     bike_id = Column(db.Integer, nullable=False)
+#     start_time = Column(db.Integer, nullable=False)
+#     start_station_id = Column(db.Integer)
+#     end_time = Column(db.Integer, nullable=False)
+#     end_station_id = Column(db.Integer)
+#     duration = Column(db.Integer, nullable=False)
+#     user_type = Column(db.Integer, nullable=True)
+#     member_age = Column(db.Integer, nullable=True)
+#     member_gender = Column(db.Integer, nullable=True)
+
+# class Station(db.Model):
+#     __tablename__ = 'station'
+#     id = Column(db.Integer, primary_key=True)
+#     station_id = Column(db.Integer, unique=True, nullable=False)
+#     station_name = Column(db.String(255), unique=True, nullable=False)
+#     latitude = Column(db.Float, nullable=False)
+#     longitude = Column(db.Float, nullable=False)
+#     neighborhood = Column(db.String(255))
+#     zipcode = Column(db.Integer)
+
+
 class Rider(Base):
     __tablename__ = 'rider'
     id = Column(Integer, primary_key=True)
