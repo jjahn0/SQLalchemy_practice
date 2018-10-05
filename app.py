@@ -1,81 +1,50 @@
-import os
+import datetime as dt 
+import numpy as np 
+import pandas as pd 
 
-from flask import (
-    Flask,
-    render_template,
-    jsonify,
-    request,
-    redirect)
-
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
-# import pymysql
-import pandas as pd
-# pymysql.install_as_MySQLdb()
+from flask import Flask, jsonify
 
-# Base = declarative_base()
-
-# from flask_sqlalchemy import SQLAlchemy
-
-# from initdb import Rider, Station
-
-#################################################
-# Flask Setup
-#################################################
-app = Flask(__name__)
-
-#################################################
-# Database Setup
-#################################################
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '') or "sqlite:///GoBike.sqlite"
-
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-# db = SQLAlchemy(app)
+## Database
 engine = create_engine("sqlite:///GoBike.sqlite")
 
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 Station = Base.classes.station
-Rider = Base.classes.rider
 
 session = Session(engine)
 
-# route for index.html - inital page
+## Flask setup
+app = Flask(__name__)
+
 @app.route("/")
-def home():
-    return render_template("index.html")
+def welcome():
+    """List of available api routes."""
+    return(
+        f"Available Routes:<br/>"
+        f"/api/v1.0/riders<br/>"
+        f"/api/v1.0/stations"
+    )
 
 @app.route("/api/v1.0/stations")
 def stations():
-    station_all = []
-    station_one = {}
-    test = {
-        "id": 101,
-        "name": "Happy Gilmore",
-        "sport" : ["hockey","golf", "Fooseball"]
-    }
-    result = session.query(Station).all()
+    """return a list of all station names"""
+    #Query all stations
+    results = session.query(Station).all()
 
-    for _row in result:
-        station_one = {
-            "station_id" : _row.station_id,
-            "station_name" : _row.station_name,
-            "latitude" : _row.latitude,
-            "longitude" : _row.longitude
-        }
-        station_all.append(station_one)
+    #convert list of tuples into normal list
+    all_station_names = list(np.ravel(results))
 
-    # return jsonify(result)
-    return jsonify(test)
-        
+    return jsonify(all_station_names)
+
+# @app.route("/api/v1.0/riders")
+# def riders():
+#     """return a list of rider data."""
 
 if __name__ == "__main__":
     app.run(debug=True)
