@@ -5,17 +5,16 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine, func, MetaData, Table
 
 from flask import Flask, jsonify
 
 ## Database
 engine = create_engine("sqlite:///GoBike.sqlite")
 
-Base = automap_base()
-Base.prepare(engine, reflect=True)
-
-Station = Base.classes.station
+metadata = MetaData()
+Stations = Table('station', metadata, autoload=True, autoload_with=engine)
+Riders = Table('rider', metadata, autoload=True, autoload_with=engine)
 
 session = Session(engine)
 
@@ -32,19 +31,42 @@ def welcome():
     )
 
 @app.route("/api/v1.0/stations")
-def stations():
-    """return a list of all station names"""
+def api_stations():
+    """return a list of all station data"""
     #Query all stations
-    results = session.query(Station).all()
+    results = session.query(Stations).all()
 
     #convert list of tuples into normal list
-    all_station_names = list(np.ravel(results))
+    all_station_data = list(np.ravel(results))
 
-    return jsonify(all_station_names)
+    return jsonify(all_station_data)
 
-# @app.route("/api/v1.0/riders")
-# def riders():
-#     """return a list of rider data."""
+
+import pandas as pd
+
+@app.route("/api/v2.0/stations")
+def api2_stations():
+    """return a list of referenced station data"""
+    station_dictionary = pd.read_sql('SELECT * FROM station;', engine.connect()).to_dict(orient='records')
+
+    return jsonify(station_dictionary)
+
+
+@app.route("/api/v1.0/riders")
+def api_riders():
+    """return a list of rider data."""
+    rider_results = session.query(Riders).all()
+    all_rider_data = list(np.ravel(rider_results))
+
+    return jsonify(all_rider_data)
+
+
+@app.route("/api/v2.0/riders")
+def api2_riders():
+    """return referenced rider data"""
+    rider_dict = pd.read_sql('SELECT * FROM rider;', engine.connect()).astype(float).to_dict(orient='records')
+    return jsonify(rider_dict)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
