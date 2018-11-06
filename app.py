@@ -7,7 +7,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, MetaData, Table
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 ## Database
 engine = create_engine("sqlite:///GoBike.sqlite")
@@ -26,9 +26,17 @@ def welcome():
     """List of available api routes."""
     return(
         f"Available Routes:<br/>"
-        f"/api/v1.0/riders<br/>"
-        f"/api/v1.0/stations"
+        f"application program interface v.1 (riders) ... /api/v1.0/riders<br/>"
+        f"application program interface v.2 (riders) ... /apt/v2.0/riders<br/>"
+        f"application program interface (stations) ... /api/v1.0/stations<br><br>"
+        f"rider data table  ...  /table"
     )
+
+@app.route("/table")
+def table():
+    """displays rider data in a table format"""
+    return render_template("table.html")
+
 
 @app.route("/api/v1.0/stations")
 def api_stations():
@@ -43,6 +51,7 @@ def api_stations():
 
 
 import pandas as pd
+
 
 @app.route("/api/v2.0/stations")
 def api2_stations():
